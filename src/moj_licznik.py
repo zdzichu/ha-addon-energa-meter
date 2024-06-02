@@ -11,7 +11,7 @@ import urllib.parse
 logger = logging.getLogger("energaMeter")
 
 path = os.path.dirname(os.path.abspath(__file__))
-db_file = 'database.sqlite'
+db_file = 'data/database.sqlite'
 db = SqliteDatabase(os.path.join(path, db_file))
 
 class ChartType(Enum):

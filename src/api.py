@@ -11,7 +11,7 @@ logger = logging.getLogger("energaMeter.api")
 
 
 path = os.path.dirname(os.path.abspath(__file__))
-db_file = 'database.sqlite'
+db_file = 'data/database.sqlite'
 db = SqliteDatabase(os.path.join(path, db_file))
 
 app = Flask(__name__)
