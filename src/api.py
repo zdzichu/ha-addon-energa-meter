@@ -207,7 +207,7 @@ def charts():
     zone = request.args.get('zone', None)
     negative = request.args.get('negative', type=bool, default=False) 
     logger.debug(f"API: GET /charts - {start_date} - {end_date}")
-    query = MainChartTable.select().where((MainChartTable.tm >= int(start_date)) & (MainChartTable.tm <= int(end_date)))
+    query = MainChartTable.select().where((MainChartTable.tm >= int(start_date)/1000) & (MainChartTable.tm <= int(end_date)/1000))
     logger.debug(f"{query}")
     factor = 1
     if negative:
@@ -226,13 +226,13 @@ def charts():
     charts = []
 
     for p in result_ppes:
-        czas = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(p.tm/1000))
+        czas = p.tm.strftime("%Y-%m-%d %H:%M:%S")
         chart = {
             'mp': p.mp,
             'meter_type': p.meter_type,
             'meter_type_url': urllib.parse.quote_plus(p.meter_type),
             'zone': p.zone,
-            'time_tm': p.tm,
+            'time_tm': int(p.tm.timestamp()*1000),
             'time': czas,
             'value': p.value * factor
         }
