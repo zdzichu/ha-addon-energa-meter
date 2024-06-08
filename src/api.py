@@ -1,4 +1,4 @@
-from peewee import SqliteDatabase
+from peewee import SqliteDatabase, PostgresqlDatabase
 from flask import Flask, jsonify, request, redirect, url_for, abort
 from waitress import serve
 #from datetime 
@@ -9,10 +9,14 @@ import urllib.parse
 
 logger = logging.getLogger("energaMeter.api")
 
-
-path = os.path.dirname(os.path.abspath(__file__))
-db_file = 'data/database.sqlite'
-db = SqliteDatabase(os.path.join(path, db_file))
+if postgresql_connstring := os.getenv("POSTGRESQL_CONNSTRING"):
+    from psycopg2.extensions import parse_dsn
+    db_name = parse_dsn(postgresql_connstring)['dbname']
+    db = PostgresqlDatabase(db_name, dsn=postgresql_connstring)
+else:
+    path = os.path.dirname(os.path.abspath(__file__))
+    db_file = 'data/database.sqlite'
+    db = SqliteDatabase(os.path.join(path, db_file))
 
 app = Flask(__name__)
 
