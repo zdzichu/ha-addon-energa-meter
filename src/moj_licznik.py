@@ -1,4 +1,5 @@
 from peewee import SqliteDatabase, PostgresqlDatabase
+from playhouse.shortcuts import ReconnectMixin
 from datetime import datetime, timedelta, date
 import calendar, requests, re, time, json, os, logging
 import http.cookiejar as cookiejar
@@ -10,11 +11,14 @@ import urllib.parse
 
 logger = logging.getLogger("energaMeter")
 
+class ReconnectPostgresqlDatabase(ReconnectMixin, PostgresqlDatabase):
+    pass
+
 if postgresql_connstring := os.getenv("POSTGRESQL_CONNSTRING"):
     from psycopg2.extensions import parse_dsn
     db_name = parse_dsn(postgresql_connstring)['dbname']
     db_host = parse_dsn(postgresql_connstring)['host']
-    db = PostgresqlDatabase(db_name, dsn=postgresql_connstring)
+    db = ReconnectPostgresqlDatabase(db_name, dsn=postgresql_connstring)
     logger.info(f"Używam bazy PostgreSQL „{db_name}” na {db_host}")
 else:
     path = os.path.dirname(os.path.abspath(__file__))
@@ -418,7 +422,7 @@ class MojLicznik:
                         )
                                                         
             except Exception as e:
-                logging.error(f"Wystąpił błąd: {str(e)}")
+                logger.error(f"Wystąpił błąd: {str(e)}")
 
         return None
     

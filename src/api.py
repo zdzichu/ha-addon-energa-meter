@@ -1,7 +1,8 @@
 from peewee import SqliteDatabase, PostgresqlDatabase
+from playhouse.shortcuts import ReconnectMixin
 from flask import Flask, jsonify, request, redirect, url_for, abort
 from waitress import serve
-#from datetime 
+#from datetime
 import datetime
 import time, os, logging
 from moj_licznik import PPETable, MeterTable, CounterTable, MainChartTable
@@ -9,10 +10,13 @@ import urllib.parse
 
 logger = logging.getLogger("energaMeter.api")
 
+class ReconnectPostgresqlDatabase(ReconnectMixin, PostgresqlDatabase):
+    pass
+
 if postgresql_connstring := os.getenv("POSTGRESQL_CONNSTRING"):
     from psycopg2.extensions import parse_dsn
     db_name = parse_dsn(postgresql_connstring)['dbname']
-    db = PostgresqlDatabase(db_name, dsn=postgresql_connstring)
+    db = ReconnectPostgresqlDatabase(db_name, dsn=postgresql_connstring)
 else:
     path = os.path.dirname(os.path.abspath(__file__))
     db_file = 'data/database.sqlite'
